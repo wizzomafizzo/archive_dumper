@@ -68,6 +68,13 @@ function filterExtensions(exts, links) {
   return matched;
 }
 
+function download(content, mimeType, filename){
+  const downloadLink = document.createElement('a')
+  downloadLink.setAttribute('href', URL.createObjectURL(new Blob([content], {type: mimeType})))
+  downloadLink.setAttribute('download', filename)
+  downloadLink.click()
+}
+
 document.querySelector("#id-url").oninput = function(e) {
   const identifer = toIdentifier(e.target.value);
   const lookup = document.querySelector("#id-lookup");
@@ -83,6 +90,7 @@ document.querySelector("#id-url").oninput = function(e) {
 }
 
 document.querySelector("#id-lookup").onclick = function() {
+  const expt = document.getElementById("id-export")
   const url = document.querySelector("#id-url").value;
   const identifier = toIdentifier(url);
   console.log(identifier);
@@ -93,7 +101,16 @@ document.querySelector("#id-lookup").onclick = function() {
       const filtered = filterExtensions(exts, links);
       const results = document.querySelector("#id-results");
       results.removeAttribute("disabled");
+      expt.removeAttribute("disabled");
       results.value = filtered.join("\n");
     })
   }
+}
+
+document.querySelector("#id-export").onclick = function() {
+  const content = document.getElementById("id-results").value
+  const filename = document.getElementById("id-url").value
+    .replace('https://archive.org/details/','')
+    .replace('/','_')
+  download(content, "text/plain", filename)
 }
